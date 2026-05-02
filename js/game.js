@@ -391,8 +391,8 @@ function showLeaderboard() {
                 row.style.cssText = i < 3 ? 'background:rgba(255,215,0,0.1);border:2px solid rgba(255,215,0,0.3);' : '';
                 row.innerHTML = `
                     <div class="leaderboard-rank" style="font-size:${i === 0 ? '24px' : '18px'};">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1)}</div>
-                    <div class="leaderboard-name">${entry.name}</div>
-                    <div class="leaderboard-score">${entry.points} نقطة</div>
+                    <div class="leaderboard-name">${sanitizeHTML(entry.name)}</div>
+                    <div class="leaderboard-score">${parseInt(entry.points) || 0} نقطة</div>
                     <div class="leaderboard-time">${mins}:${secs.toString().padStart(2,'0')}</div>
                 `;
                 list.appendChild(row);
