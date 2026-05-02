@@ -335,7 +335,7 @@ body {
     backdrop-filter: blur(20px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     padding: 12px 20px;
-    z-index: 999;
+    z-index: 990; /* ✅ أقل من sidebar (999) */
     display: none;
     grid-template-columns: repeat(4, 1fr);
     gap: 10px;
@@ -917,4 +917,4 @@ body {
     </div>
     
     <!-- Logout Button (Fixed at bottom) -->
-    <div class="sidebar-item" onclick="logout()" style="margin-top:auto;background:rgba(239,68,68,0.1);border:2px solid rgba(239,68,68,0.3);border-radius:12px;transition:all 0.3s;" onmouseover="this.style.background='rgba(239,68,68,0.2)';this.style.borderColor='rg
+    <div class="sidebar-item" onclick="logout()" style="margin-top:auto;background:rgba(239,68,68,0.1);border:2px solid rgba(239,68,68,0.3);border-radius:12px;transition:all 0.3s;" onmouseover="this.style.background='rgba(239,68,68,0.2
