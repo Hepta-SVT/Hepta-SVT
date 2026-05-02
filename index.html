@@ -86,15 +86,20 @@
             <h2 style="font-size:32px;font-weight:800;margin-bottom:10px;">مرحباً بك!</h2>
             <p style="color:var(--gray);margin-bottom:30px;">أدخل اسمك الكامل للبدء</p>
             <input type="text" id="firstName" placeholder="الاسم..." maxlength="20"
+                   autocomplete="off" spellcheck="false"
                    style="width:100%;padding:15px 20px;background:rgba(255,255,255,0.05);border:2px solid rgba(255,255,255,0.1);border-radius:12px;color:var(--white);font-size:18px;font-family:'Cairo',sans-serif;margin-bottom:15px;text-align:center;"
-                   onkeyup="checkNameInput()">
+                   onkeyup="checkNameInput()" oninput="this.value=this.value.replace(/[<>&\"'\/]/g,'')">
             <input type="text" id="lastName" placeholder="النسب..." maxlength="20"
+                   autocomplete="off" spellcheck="false"
                    style="width:100%;padding:15px 20px;background:rgba(255,255,255,0.05);border:2px solid rgba(255,255,255,0.1);border-radius:12px;color:var(--white);font-size:18px;font-family:'Cairo',sans-serif;margin-bottom:15px;text-align:center;"
-                   onkeyup="checkNameInput()" onkeypress="if(event.key==='Enter') submitName()">
+                   onkeyup="checkNameInput()" onkeypress="if(event.key==='Enter') submitName()" oninput="this.value=this.value.replace(/[<>&\"'\/]/g,'')">
             <div id="nameError" style="display:none;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);border-radius:12px;padding:15px;margin-bottom:20px;font-size:14px;color:var(--danger);">
                 ⚠️ هذا الاسم مسجل بالفعل! الرجاء استخدام اسم آخر
             </div>
             <button class="btn btn-primary" id="startBtn" onclick="submitName()" disabled>دخول المنصة 🚀</button>
+            <p style="margin-top:18px;font-size:12px;color:rgba(255,255,255,0.35);line-height:1.6;">
+                🔒 يُستخدم اسمك فقط لعرض نتائجك على المنصة.<br>لا تُجمع أي بيانات شخصية أخرى.
+            </p>
         </div>
     </div>
 </section>
