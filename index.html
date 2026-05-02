@@ -82,9 +82,10 @@
 <section id="nameScreen" class="page active">
     <div style="max-width:500px;margin:80px auto;text-align:center;">
         <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:50px 40px;">
-            <div style="font-size:70px;margin-bottom:15px;">👋</div>
-            <h2 style="font-size:32px;font-weight:800;margin-bottom:10px;">مرحباً بك!</h2>
-            <p style="color:var(--gray);margin-bottom:30px;">أدخل اسمك الكامل للبدء</p>
+            <div style="font-size:70px;margin-bottom:15px;" id="screenEmoji">👋</div>
+            <h2 style="font-size:32px;font-weight:800;margin-bottom:10px;" id="screenTitle">مرحباً بك!</h2>
+            <p style="color:var(--gray);margin-bottom:30px;" id="screenSubtitle">أدخل اسمك الكامل للبدء</p>
+
             <input type="text" id="firstName" placeholder="الاسم..." maxlength="20"
                    autocomplete="off" spellcheck="false"
                    style="width:100%;padding:15px 20px;background:rgba(255,255,255,0.05);border:2px solid rgba(255,255,255,0.1);border-radius:12px;color:var(--white);font-size:18px;font-family:'Cairo',sans-serif;margin-bottom:15px;text-align:center;"
@@ -92,10 +93,27 @@
             <input type="text" id="lastName" placeholder="النسب..." maxlength="20"
                    autocomplete="off" spellcheck="false"
                    style="width:100%;padding:15px 20px;background:rgba(255,255,255,0.05);border:2px solid rgba(255,255,255,0.1);border-radius:12px;color:var(--white);font-size:18px;font-family:'Cairo',sans-serif;margin-bottom:15px;text-align:center;"
-                   onkeyup="checkNameInput()" onkeypress="if(event.key==='Enter') submitName()" oninput="this.value=this.value.replace(/[<>&\"'\/]/g,'')">
-            <div id="nameError" style="display:none;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);border-radius:12px;padding:15px;margin-bottom:20px;font-size:14px;color:var(--danger);">
-                ⚠️ هذا الاسم مسجل بالفعل! الرجاء استخدام اسم آخر
+                   onkeyup="checkNameInput()" oninput="this.value=this.value.replace(/[<>&\"'\/]/g,'')">
+
+            <!-- قسم PIN — يظهر بعد إدخال الاسم -->
+            <div id="pinSection" style="display:none;">
+                <div id="pinLabel" style="font-size:15px;color:rgba(255,255,255,0.7);margin-bottom:12px;font-weight:600;padding:10px;background:rgba(99,102,241,0.1);border-radius:10px;"></div>
+                <input type="password" id="pinCode" placeholder="• • • •" maxlength="4"
+                       inputmode="numeric" pattern="[0-9]*" autocomplete="off"
+                       style="width:100%;padding:15px 20px;background:rgba(255,255,255,0.05);border:2px solid rgba(255,255,255,0.1);border-radius:12px;color:var(--white);font-size:32px;font-family:'Cairo',sans-serif;margin-bottom:15px;text-align:center;letter-spacing:10px;"
+                       onkeyup="checkNameInput()" onkeypress="if(event.key==='Enter') submitName()"
+                       oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+                <!-- تأكيد PIN للمستخدمين الجدد فقط -->
+                <div id="pinConfirmSection" style="display:none;">
+                    <input type="password" id="pinConfirm" placeholder="• • • •" maxlength="4"
+                           inputmode="numeric" pattern="[0-9]*" autocomplete="off"
+                           style="width:100%;padding:15px 20px;background:rgba(255,255,255,0.05);border:2px solid rgba(255,255,255,0.1);border-radius:12px;color:var(--white);font-size:32px;font-family:'Cairo',sans-serif;margin-bottom:15px;text-align:center;letter-spacing:10px;"
+                           onkeyup="checkNameInput()" onkeypress="if(event.key==='Enter') submitName()"
+                           oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+                </div>
             </div>
+
+            <div id="nameError" style="display:none;border-radius:12px;padding:15px;margin-bottom:20px;font-size:14px;"></div>
             <button class="btn btn-primary" id="startBtn" onclick="submitName()" disabled>دخول المنصة 🚀</button>
             <p style="margin-top:18px;font-size:12px;color:rgba(255,255,255,0.35);line-height:1.6;">
                 🔒 يُستخدم اسمك فقط لعرض نتائجك على المنصة.<br>لا تُجمع أي بيانات شخصية أخرى.
