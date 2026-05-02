@@ -1,101 +1,133 @@
-<!-- Levels Screen (اختيار المستوى) -->
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hepta-SVT - منصة علوم الحياة والأرض</title>
+    <link rel="icon" type="image/jpeg" href="logo.jpg">
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="bg-animation"></div>
+
+<nav class="navbar">
+    <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+    <h1 class="logo-text">Hepta-SVT</h1>
+    <div id="userNameDisplay" style="display:none;">👤 <span id="userNameText"></span></div>
+</nav>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-item" onclick="navigateTo('dashboard')">🏠 الرئيسية</div>
+    <div class="sidebar-item" onclick="navigateTo('lessons')">📚 الدروس</div>
+    <div class="sidebar-item" onclick="navigateTo('tests')">✍️ اختبر نفسك</div>
+    <div class="sidebar-item" onclick="navigateTo('levelsScreen')">🎮 الألعاب</div>
+    <div class="sidebar-item" onclick="navigateTo('exercises')">📝 تمارين</div>
+    <div class="sidebar-item" onclick="logout()" style="margin-top:auto;">🚪 تسجيل الخروج</div>
+</aside>
+
+<div class="game-hud" id="gameHud">
+    <div class="hud-item"><div class="hud-label">المستوى</div><div class="hud-value" id="hudLevel">1</div></div>
+    <div class="hud-item"><div class="hud-label">السؤال</div><div class="hud-value" id="hudQuestion">1/10</div></div>
+    <div class="hud-item"><div class="hud-label">النقاط</div><div class="hud-value points" id="hudPoints">0</div></div>
+    <div class="hud-item"><div class="hud-label">الوقت</div><div class="hud-value timer" id="hudTimer">00:00</div></div>
+</div>
+
+<main class="main">
+
+<!-- شاشة تسجيل الدخول -->
+<section id="nameScreen" class="page active">
+    <div style="max-width:500px;margin:80px auto;text-align:center;">
+        <div style="background:rgba(255,255,255,0.05);border-radius:16px;padding:50px;">
+            <div style="font-size:70px;">👋</div>
+            <h2>مرحباً بك!</h2>
+            <input type="text" id="firstName" placeholder="الاسم..." style="width:100%;padding:15px;margin:10px 0;background:rgba(255,255,255,0.05);border-radius:12px;color:white;">
+            <input type="text" id="lastName" placeholder="النسب..." style="width:100%;padding:15px;margin:10px 0;background:rgba(255,255,255,0.05);border-radius:12px;color:white;">
+            <button class="btn btn-primary" onclick="submitName()" style="width:100%;">دخول 🚀</button>
+        </div>
+    </div>
+</section>
+
+<!-- الصفحة الرئيسية -->
+<section id="dashboard" class="page">
+    <div style="text-align:center;margin-bottom:40px;">
+        <h1 style="font-size:48px;background:linear-gradient(135deg,#6366f1,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Hepta-SVT</h1>
+        <p>منصة علوم الحياة والأرض</p>
+    </div>
+    <div style="position:relative;max-width:650px;margin:0 auto;">
+        <div style="min-height:400px;">
+            <div class="carousel-slide" style="position:absolute;width:100%;padding:40px;background:linear-gradient(135deg,rgba(59,130,246,0.15),rgba(37,99,235,0.05));border-radius:20px;text-align:center;">
+                <div style="width:80px;height:80px;background:linear-gradient(135deg,#3b82f6,#2563eb);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:40px;margin:0 auto 20px;">📚</div>
+                <h3>ملخصات الدروس</h3>
+                <button onclick="navigateTo('lessons')" class="btn btn-primary" style="margin-top:20px;">استكشف →</button>
+            </div>
+            <div class="carousel-slide" style="position:absolute;width:100%;padding:40px;background:linear-gradient(135deg,rgba(16,185,129,0.15),rgba(5,150,105,0.05));border-radius:20px;text-align:center;opacity:0;visibility:hidden;">
+                <div style="width:80px;height:80px;background:linear-gradient(135deg,#10b981,#059669);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:40px;margin:0 auto 20px;">🎮</div>
+                <h3>ألعاب تربوية</h3>
+                <button onclick="navigateTo('levelsScreen')" class="btn btn-primary" style="margin-top:20px;">العب →</button>
+            </div>
+        </div>
+        <div style="display:flex;justify-content:center;gap:12px;margin-top:35px;">
+            <div class="carousel-dot" onclick="goToCard(0)" style="width:12px;height:12px;border-radius:50%;background:var(--primary);cursor:pointer;"></div>
+            <div class="carousel-dot" onclick="goToCard(1)" style="width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,0.3);cursor:pointer;"></div>
+        </div>
+    </div>
+</section>
+
+<!-- باقي الصفحات -->
 <section id="levelsScreen" class="page">
-    <button class="back-btn" onclick="navigateTo('tests')">← الرجوع</button>
-    <h2 style="text-align:center;margin:20px 0;">اختر المستوى</h2>
+    <button class="back-btn" onclick="navigateTo('dashboard')">← الرجوع</button>
+    <h2 style="text-align:center;">اختر المستوى</h2>
     <div class="levels-grid" id="levelsGrid"></div>
 </section>
 
-<!-- Game Screen (شاشة اللعبة) -->
 <section id="gameScreen" class="page">
     <div class="game-content">
-        <div class="question-card">
-            <div class="clue-box">
-                <div class="clue-label">💡 الدليل</div>
-                <div class="clue-text" id="clueText"></div>
-            </div>
-            <div class="answer-section">
-                <div class="answer-label">✏️ رتب الحروف هنا</div>
-                <div class="answer-slots" id="answerSlots"></div>
-            </div>
-            <div class="choices-section">
-                <div class="choices-label">🔡 الحروف المتاحة</div>
-                <div class="letter-choices" id="letterChoices"></div>
-            </div>
-            <div class="game-actions">
-                <button class="btn btn-ghost" onclick="resetLetters()">↺ إعادة</button>
-                <button class="btn btn-warning" onclick="useHint()">💡 مساعدة (-5)</button>
-                <button class="btn btn-danger" onclick="skipQuestion()">⏭ تخطي (-10)</button>
-                <button class="btn btn-primary" onclick="checkAnswer()">✔ تحقق</button>
-            </div>
+        <div class="clue-box"><div class="clue-text" id="clueText"></div></div>
+        <div class="answer-slots" id="answerSlots"></div>
+        <div class="letter-choices" id="letterChoices"></div>
+        <div class="game-actions">
+            <button class="btn btn-ghost" onclick="resetLetters()">↺ إعادة</button>
+            <button class="btn btn-warning" onclick="useHint()">💡 مساعدة (-5)</button>
+            <button class="btn btn-danger" onclick="skipQuestion()">⏭ تخطي (-10)</button>
+            <button class="btn btn-primary" onclick="checkAnswer()">✔ تحقق</button>
         </div>
     </div>
 </section>
 
-<!-- Quiz Screen (شاشة الاختبار) -->
 <section id="quizScreen" class="page">
-    <button class="back-btn" onclick="navigateTo('quizRelation')">← الرجوع</button>
-    <div class="quiz-container">
-        <div class="quiz-stats">
-            <div>السؤال <span id="quizProgress">1/20</span></div>
-            <div>✅ <span id="quizCorrect">0</span></div>
-            <div>❌ <span id="quizWrong">0</span></div>
-        </div>
-        <div class="quiz-question" id="quizQuestion"></div>
-        <div class="quiz-options" id="quizOptions"></div>
-        <button id="quizNextBtn" class="btn btn-primary" style="display:none;" onclick="nextQuizQuestion()">التالي →</button>
-    </div>
-</section>
-
-<!-- Exercises (تمارين) -->
-<section id="exercises" class="page">
-    <h2>📝 تمارين</h2>
-    <div class="exercises-list">
-        <div class="exercise-card" onclick="showMessage('قريباً! سيتم إضافة التمارين', 'info')">
-            📄 سلسلة تمارين 1
-        </div>
-        <div class="exercise-card" onclick="showMessage('قريباً! سيتم إضافة التمارين', 'info')">
-            📄 سلسلة تمارين 2
-        </div>
-    </div>
-</section>
-
-<!-- Videos -->
-<section id="videos" class="page">
-    <h2>🎥 فيديوهات تعليمية</h2>
-    <div style="text-align:center;padding:80px;">📹 قريباً</div>
-</section>
-
-<!-- Laboratory -->
-<section id="laboratory" class="page">
-    <h2>🧪 المختبر الافتراضي</h2>
-    <div style="text-align:center;padding:80px;">🔬 قريباً</div>
-</section>
-
-<!-- Tests -->
-<section id="tests" class="page">
-    <h2>✍️ اختبر نفسك</h2>
-    <div class="cards-grid">
-        <div class="card" onclick="navigateTo('quizRelation')">
-            <div class="card-icon">🧠</div>
-            <h3>Les fonctions de relation</h3>
-        </div>
-    </div>
-</section>
-
-<!-- Quiz Relation -->
-<section id="quizRelation" class="page">
     <button class="back-btn" onclick="navigateTo('tests')">← الرجوع</button>
-    <h2>🧠 Fonctions de relation</h2>
-    <div class="cards-grid">
-        <div class="card" onclick="startQuiz('easy')">
-            <div class="card-icon">😊</div>
-            <h3>المستوى السهل</h3>
-        </div>
+    <div class="quiz-stats">
+        <div>السؤال <span id="quizProgress">1/20</span></div>
+        <div>✅ <span id="quizCorrect">0</span></div>
+        <div>❌ <span id="quizWrong">0</span></div>
     </div>
+    <div class="quiz-question" id="quizQuestion"></div>
+    <div class="quiz-options" id="quizOptions"></div>
+    <button id="quizNextBtn" class="btn btn-primary" style="display:none;" onclick="nextQuizQuestion()">التالي →</button>
 </section>
 
-<!-- Lessons -->
 <section id="lessons" class="page">
     <h2>📚 الدروس</h2>
     <div class="cards-grid" id="lessonsGrid"></div>
 </section>
+
+<section id="tests" class="page">
+    <h2>✍️ اختبر نفسك</h2>
+    <div class="cards-grid">
+        <div class="card" onclick="startQuiz('easy')"><div class="card-icon">🧠</div><h3>اختبار سهل</h3></div>
+    </div>
+</section>
+
+<section id="exercises" class="page"><h2>📝 تمارين</h2><div style="text-align:center;padding:80px;">⏳ قريباً</div></section>
+
+</main>
+
+<script src="js/config.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/game.js"></script>
+<script src="js/quiz.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
