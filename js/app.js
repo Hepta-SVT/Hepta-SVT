@@ -2,6 +2,23 @@
 // APP.JS - التطبيق الرئيسي
 // ========================================
 
+// ---------- 0. حماية XSS - تنظيف المدخلات ----------
+function sanitizeHTML(str) {
+    if (typeof str !== 'string') return String(str);
+    return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#x27;')
+        .replace(/\//g, '&#x2F;');
+}
+
+function isValidName(name) {
+    // حروف عربية أو لاتينية أو مسافة فقط — لا رموز HTML
+    return /^[\u0600-\u06FFa-zA-ZÀ-ÿ\s'-]{2,20}$/.test(name);
+}
+
 // ---------- 1. تتبع Google Sheets ----------
 const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxVf8ZqJQ7wQ3Ny9mXzJ8KqP4vH5L6tM2nR/exec';
 
@@ -71,12 +88,12 @@ function checkNameInput() {
     const btn = document.getElementById('startBtn');
     const error = document.getElementById('nameError');
 
-    if (firstName.length >= 2 && lastName.length >= 2) {
-        btn.disabled = false;
+    if (isValidName(firstName) && isValidName(lastName)) {
         const fullName = firstName + ' ' + lastName;
         const leaderboard = loadLeaderboard();
         const exists = leaderboard.some(entry => entry.name.toLowerCase() === fullName.toLowerCase());
         error.style.display = exists ? 'block' : 'none';
+        btn.disabled = exists;
     } else {
         btn.disabled = true;
         error.style.display = 'none';
@@ -87,8 +104,8 @@ function submitName() {
     const firstName = document.getElementById('firstName').value.trim();
     const lastName = document.getElementById('lastName').value.trim();
 
-    if (firstName.length < 2 || lastName.length < 2) {
-        alert('الرجاء إدخال الاسم والنسب (حرفين على الأقل لكل منهما)');
+    if (!isValidName(firstName) || !isValidName(lastName)) {
+        alert('الرجاء إدخال الاسم والنسب بحروف صحيحة فقط (حرفين على الأقل، بدون رموز)');
         return;
     }
 
@@ -111,10 +128,11 @@ function submitName() {
     if (dashboardNameEl) dashboardNameEl.textContent = firstName;
 
     const overlay = document.getElementById('feedback');
+    const safeFirstName = sanitizeHTML(firstName);
     overlay.innerHTML = `
         <div class="feedback-card">
             <div class="feedback-icon">🎉</div>
-            <div class="feedback-title success">مرحباً ${firstName}!</div>
+            <div class="feedback-title success">مرحباً ${safeFirstName}!</div>
             <div class="feedback-msg">نتمنى لك تجربة تعليمية ممتعة 🌟</div>
         </div>
     `;
