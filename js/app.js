@@ -15,8 +15,35 @@ function sanitizeHTML(str) {
 }
 
 function isValidName(name) {
-    // حروف عربية أو لاتينية أو مسافة فقط — لا رموز HTML
     return /^[\u0600-\u06FFa-zA-ZÀ-ÿ\s'-]{2,20}$/.test(name);
+}
+
+// ---------- 0b. نظام PIN ----------
+function hashPIN(pin) {
+    const str = pin + 'hepta-svt-2025-salt';
+    let hash = 5381;
+    for (let i = 0; i < str.length; i++) {
+        hash = ((hash << 5) + hash) ^ str.charCodeAt(i);
+        hash = hash >>> 0;
+    }
+    return hash.toString(36);
+}
+
+function getPINKey(fullName) {
+    return 'heptaPIN_' + fullName.toLowerCase().replace(/\s+/g, '_');
+}
+
+function savePIN(fullName, pin) {
+    localStorage.setItem(getPINKey(fullName), hashPIN(pin));
+}
+
+function verifyPIN(fullName, pin) {
+    const stored = localStorage.getItem(getPINKey(fullName));
+    return stored !== null && stored === hashPIN(pin);
+}
+
+function hasPIN(fullName) {
+    return localStorage.getItem(getPINKey(fullName)) !== null;
 }
 
 // ---------- 1. تتبع Google Sheets ----------
@@ -84,38 +111,100 @@ const gameState = {
 // ---------- 4. شاشة إدخال الاسم ----------
 function checkNameInput() {
     const firstName = document.getElementById('firstName').value.trim();
-    const lastName = document.getElementById('lastName').value.trim();
-    const btn = document.getElementById('startBtn');
-    const error = document.getElementById('nameError');
+    const lastName  = document.getElementById('lastName').value.trim();
+    const btn       = document.getElementById('startBtn');
+    const error     = document.getElementById('nameError');
+    const pinSection        = document.getElementById('pinSection');
+    const pinConfirmSection = document.getElementById('pinConfirmSection');
+    const pinLabel  = document.getElementById('pinLabel');
+    const pinCode   = document.getElementById('pinCode').value;
+    const pinConfirm= document.getElementById('pinConfirm').value;
 
-    if (isValidName(firstName) && isValidName(lastName)) {
-        const fullName = firstName + ' ' + lastName;
-        const leaderboard = loadLeaderboard();
-        const exists = leaderboard.some(entry => entry.name.toLowerCase() === fullName.toLowerCase());
-        error.style.display = exists ? 'block' : 'none';
-        btn.disabled = exists;
+    error.style.display = 'none';
+    error.textContent   = '';
+    btn.disabled = true;
+
+    if (!isValidName(firstName) || !isValidName(lastName)) {
+        pinSection.style.display = 'none';
+        document.getElementById('screenEmoji').textContent = '👋';
+        document.getElementById('screenTitle').textContent = 'مرحباً بك!';
+        document.getElementById('screenSubtitle').textContent = 'أدخل اسمك الكامل للبدء';
+        btn.textContent = 'دخول المنصة 🚀';
+        return;
+    }
+
+    const fullName    = firstName + ' ' + lastName;
+    const returning   = hasPIN(fullName);
+    pinSection.style.display = 'block';
+
+    if (returning) {
+        // تلميذ موجود → وضع الدخول
+        document.getElementById('screenEmoji').textContent    = '🔑';
+        document.getElementById('screenTitle').textContent    = 'مرحباً بعودتك!';
+        document.getElementById('screenSubtitle').textContent = 'أدخل رمز PIN الخاص بك';
+        pinLabel.textContent = `🔐 رمز PIN الخاص بـ ${firstName}`;
+        pinConfirmSection.style.display = 'none';
+        btn.textContent = 'دخول 🔑';
+
+        if (pinCode.length === 4) {
+            if (verifyPIN(fullName, pinCode)) {
+                btn.disabled = false;
+            } else {
+                error.style.display = 'block';
+                error.style.cssText += 'background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#ef4444;';
+                error.textContent = '❌ رمز PIN غير صحيح، حاول مجدداً';
+            }
+        }
     } else {
-        btn.disabled = true;
-        error.style.display = 'none';
+        // تلميذ جديد → وضع التسجيل
+        document.getElementById('screenEmoji').textContent    = '👋';
+        document.getElementById('screenTitle').textContent    = 'مرحباً بك!';
+        document.getElementById('screenSubtitle').textContent = 'أدخل اسمك واختر رمز PIN';
+        pinLabel.textContent = '🔐 اختر رمز PIN من 4 أرقام';
+        pinConfirmSection.style.display = 'block';
+        btn.textContent = 'تسجيل ودخول 🚀';
+
+        if (pinCode.length === 4 && pinConfirm.length === 4) {
+            if (pinCode === pinConfirm) {
+                btn.disabled = false;
+            } else {
+                error.style.display = 'block';
+                error.style.cssText += 'background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#ef4444;';
+                error.textContent = '⚠️ رمزا PIN غير متطابقين، أعد المحاولة';
+            }
+        }
     }
 }
 
 function submitName() {
-    const firstName = document.getElementById('firstName').value.trim();
-    const lastName = document.getElementById('lastName').value.trim();
+    const firstName  = document.getElementById('firstName').value.trim();
+    const lastName   = document.getElementById('lastName').value.trim();
+    const pinCode    = document.getElementById('pinCode').value;
+    const pinConfirm = document.getElementById('pinConfirm').value;
 
     if (!isValidName(firstName) || !isValidName(lastName)) {
-        alert('الرجاء إدخال الاسم والنسب بحروف صحيحة فقط (حرفين على الأقل، بدون رموز)');
+        alert('الرجاء إدخال الاسم والنسب بحروف صحيحة فقط');
+        return;
+    }
+    if (pinCode.length !== 4) {
+        alert('الرجاء إدخال رمز PIN من 4 أرقام');
         return;
     }
 
-    const fullName = firstName + ' ' + lastName;
-    const leaderboard = loadLeaderboard();
-    const exists = leaderboard.some(entry => entry.name.toLowerCase() === fullName.toLowerCase());
+    const fullName  = firstName + ' ' + lastName;
+    const returning = hasPIN(fullName);
 
-    if (exists) {
-        alert('هذا الاسم مسجل بالفعل! الرجاء استخدام اسم آخر');
-        return;
+    if (returning) {
+        if (!verifyPIN(fullName, pinCode)) {
+            alert('❌ رمز PIN غير صحيح!');
+            return;
+        }
+    } else {
+        if (pinCode !== pinConfirm) {
+            alert('⚠️ رمزا PIN غير متطابقين!');
+            return;
+        }
+        savePIN(fullName, pinCode);
     }
 
     gameState.playerName = fullName;
@@ -131,9 +220,9 @@ function submitName() {
     const safeFirstName = sanitizeHTML(firstName);
     overlay.innerHTML = `
         <div class="feedback-card">
-            <div class="feedback-icon">🎉</div>
-            <div class="feedback-title success">مرحباً ${safeFirstName}!</div>
-            <div class="feedback-msg">نتمنى لك تجربة تعليمية ممتعة 🌟</div>
+            <div class="feedback-icon">${returning ? '🎉' : '🎊'}</div>
+            <div class="feedback-title success">${returning ? 'مرحباً بعودتك' : 'مرحباً'} ${safeFirstName}!</div>
+            <div class="feedback-msg">${returning ? 'سعداء بعودتك إلى المنصة 🌟' : 'نتمنى لك تجربة تعليمية ممتعة 🌟'}</div>
         </div>
     `;
     overlay.classList.add('active');
@@ -277,10 +366,22 @@ function logout() {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         document.getElementById('gameHud').classList.remove('active');
         document.querySelector('section').classList.add('active');
-        document.getElementById('firstName').value = '';
-        document.getElementById('lastName').value = '';
-        document.getElementById('startBtn').disabled = true;
+
+        // إعادة تعيين النموذج كاملاً
+        document.getElementById('firstName').value   = '';
+        document.getElementById('lastName').value    = '';
+        document.getElementById('pinCode').value     = '';
+        document.getElementById('pinConfirm').value  = '';
+        document.getElementById('pinSection').style.display        = 'none';
+        document.getElementById('pinConfirmSection').style.display = 'none';
+        document.getElementById('nameError').style.display         = 'none';
+        document.getElementById('startBtn').disabled    = true;
+        document.getElementById('startBtn').textContent = 'دخول المنصة 🚀';
+        document.getElementById('screenEmoji').textContent    = '👋';
+        document.getElementById('screenTitle').textContent    = 'مرحباً بك!';
+        document.getElementById('screenSubtitle').textContent = 'أدخل اسمك الكامل للبدء';
         document.getElementById('userNameDisplay').style.display = 'none';
+
         closeSidebar();
         window.scrollTo(0, 0);
     }
